@@ -15,9 +15,11 @@ class LPEffDetPubLayNetBlockPredictor(LPPredictor):
     @classmethod
     def from_pretrained(
         cls,
+        model_path: str = None,
         device: Optional[str] = None,
     ):
         return super().from_pretrained(
             config_path="lp://efficientdet/PubLayNet",
+            model_path=model_path,
             device=device,
         )

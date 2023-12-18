@@ -77,9 +77,11 @@ VILA_LABELS_MAP = {
 class CoreRecipe(Recipe):
     def __init__(
         self,
+        publaynet_predictor_path: str = "publaynet-tf_efficientdet_d0.pth.tar",
         ivila_predictor_path: str = "allenai/ivila-row-layoutlm-finetuned-s2vl-v2",
         bio_roberta_predictor_path: str = "allenai/vila-roberta-large-s2vl-internal",
         svm_word_predictor_path: str = "https://ai2-s2-research-public.s3.us-west-2.amazonaws.com/mmda/models/svm_word_predictor.tar.gz",
+        device:str = "cuda:0",
         dpi: int = 72,
     ):
         self.logger = logging.getLogger(self.__class__.__name__)
@@ -93,12 +95,13 @@ class CoreRecipe(Recipe):
             warnings.simplefilter("ignore")
             self.word_predictor = SVMWordPredictor.from_path(svm_word_predictor_path)
 
-        self.publaynet_block_predictor = LPEffDetPubLayNetBlockPredictor.from_pretrained()
-        self.ivila_predictor = IVILATokenClassificationPredictor.from_pretrained(ivila_predictor_path)
+        self.publaynet_block_predictor = LPEffDetPubLayNetBlockPredictor.from_pretrained(publaynet_predictor_path, device=device)
+        self.ivila_predictor = IVILATokenClassificationPredictor.from_pretrained(ivila_predictor_path, device=device)
         self.bio_roberta_predictor = HFBIOTaggerPredictor.from_pretrained(
             bio_roberta_predictor_path,
             entity_name="tokens",
             context_name="pages",
+            device=device,
         )
         self.sent_predictor = PysbdSentencePredictor()
         self.logger.info("Finished instantiating recipe")
